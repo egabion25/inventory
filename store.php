@@ -56,6 +56,19 @@
 	  	$row_class = !$row_class;
 
 
+	  	// break;
+
+		// echo "<pre>";
+		// print_r($inventory);
+		// echo "</pre>";
+		// die();
+
+	// echo "<pre>";
+	// print_r(	$orders	);
+	// echo "</pre>";
+	// die();
+
+
 
 	  	
   	}
@@ -120,13 +133,22 @@ function create_stock_row( $day,  $row_class=false){
 	$stock_row = "<tr class='". $row_class . "'>";
 	$stock_row .=  "<td> Day-". $day ."&emsp; Stock</td>";
 	for($i = 1; $i <= COUNT($products); $i++) {
-		$stock_row .= "<td>".  $products[$i]["qty"] ."</td>";
+		// $stock_row .= "<td>".  $products[$i]["qty"] ."</td>";
+		$stock_row .= "<td>".  $inventory[$day][$i] ."</td>";
 
-		
+	// echo "<pre>";
+	// print_r($inventory[$day]);
+	// echo "</pre>";
+	// die();
+	
 	}
 	$stock_row .=  "</tr>";
 	return $stock_row;
 }
+
+
+
+
 
 function create_current_stock_row( $day, $order, $row_class=false){
 
@@ -135,58 +157,66 @@ function create_current_stock_row( $day, $order, $row_class=false){
 	// echo "</pre>";
 	// die();
 
-
-
 	global $products, $inventory;
 	$stock_row = "<tr class='". $row_class . "'>";
 	$stock_row .=  "<td> Day-". $day ."&emsp; Remaining</td>";
-		for($i = 1; $i <= COUNT($products); $i++) {
-
-
-
-			if(	!isset($order[$i])	){
-				$order[$i] = 0;
+		for($product_id = 1; $product_id <= COUNT($products); $product_id++) {
+			
+			if(	!isset($order[$product_id])	){
+				$order[$product_id] = 0;
 			}
-			
-			$remaining_stock = 	$products[$i]["qty"] - $order[$i];
 
-			$product_states[$i] = $remaining_stock;
-
+			$remaining_stock = 	$products[$product_id]["qty"] - $order[$product_id];
 			$stock_row .= "<td>".  $remaining_stock ."</td>";
-			
+			$product_states[$product_id] = $remaining_stock;
 
 		}
-
-
-
 
 		// echo "<pre>";
 		// print_r(	$product_states			);
 		// echo "</pre>";
 		// die();
 
-
-
-
-
-
-	$inventory[$day] = $product_states; 
+	$inventory[$day+1] = $product_states; 
 
 	$stock_row .=  "</tr>";
 	return $stock_row;
 }
 
 
-function create_orders_row( $day, $orders, $row_class=false){
-	global $products;
+function create_orders_row( $day, $orders_today, $row_class=false){
+	global $products, $inventory, $orders;
 	$stock_row = "<tr class='". $row_class . "'>";
 	$stock_row .=  "<td> Day-". $day ."&emsp; Customer Orders</td>";
-		for($i = 1; $i <= COUNT($products); $i++) {
-			if( !isset($orders[$i]) )
-				$orders[$i] = 0;
-			$stock_row .= "<td>". $orders[$i]  ."</td>";
+	$cells = "";
+		for($product_id = 1; $product_id <= COUNT($products); $product_id++) {
+
+			if( !isset($orders_today[$product_id]) )
+				$orders_today[$product_id] = 0;
+			if( ($inventory[$day][$product_id] - $orders_today[$product_id]) >= 0  ){
+
+
+
+					foreach ($orders[ $day] as $key => $order) {
+							$orders[ $day][$key] = 0;
+						// echo "<pre>";
+						// print_r(		);
+						// echo "</pre>";
+						// die();
+					}
+
+
+
+				$cells .=  "<td>". $orders_today[$product_id]  ."</td>";
+			}else{
+				$cells .= "<td>". $orders_today[$product_id]  ." (cancelled / out-of-stock )  </td>";
+			}
 		}
+	$stock_row .=  $cells;
 	$stock_row .=  "</tr>";
+
+
+
 	return $stock_row;
 }
 

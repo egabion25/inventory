@@ -10,15 +10,9 @@
 $str = file_get_contents('orders-sample.json');
 $orders = json_decode($str, true);
 
-$inventory = array();
 
+$inventory = Array( 1 => Array( 1 => 5, 2 => 5, 3 => 5, 4 => 5, 5 => 5 ) );
 
-
-
-// echo "<pre>";
-// print_r($json);
-// echo "</pre>";
-// die();
 
 	include_once("store.php");
 ?>
